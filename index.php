@@ -1,29 +1,13 @@
 <?php
+set_include_path(implode(PATH_SEPARATOR, array(
+    realpath('./library'),//the path
+    get_include_path(),
+)));
+require "Zend/Loader/Autoloader.php";
+$autoloader = Zend_Loader_Autoloader::getInstance();
 
-class IndexController extends Zend_Controller_Action
-{
-
-    public function init()
-    {
-        if ($this->_helper->FlashMessenger->hasMessages()) {
-            $this->view->messages = $this->_helper->FlashMessenger->getMessages();
-            $messages = $this->_helper->flashMessenger->getMessages();
-            if(!empty($messages)){
-                $this->_helper->layout->getView()->message = $messages[0];
-            }            
-        }
-    }
-
-    public function indexAction()
-    {
-        $this->getHelper('Layout')
-             ->disableLayout();
-
-        $this->getHelper('ViewRenderer')
-             ->setNoRender();
-
-        $this->getResponse()
-             ->setHeader('Content-Type', 'application/json');        
+$channel = new Zend_Feed_Rss('http://feeds.bbci.co.uk/news/rss.xml?edition=uk');
+    
         $channel = new Zend_Feed_Rss('http://feeds.bbci.co.uk/news/rss.xml?edition=uk');
         //echo $channel->title();
         $i = 0;
@@ -50,10 +34,9 @@ class IndexController extends Zend_Controller_Action
                 break;
            
         }
-        echo $this->_helper->json->sendJson($result);
-        //print_r($channel);
-    }
+        header('Content-Type: application/json');
+        echo json_encode($result);
 
 
-}
+ 
 
